@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - GymCore ERP</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="./css/style.css">
+  
+  <style>
+    .login-body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: radial-gradient(circle at top left, rgba(0,230,118,0.1), transparent 40%), var(--bg-color);
+    }
+    .login-box {
+        background-color: rgba(21, 27, 43, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--border-highlight);
+        border-radius: var(--radius-lg);
+        padding: 50px 40px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 40px rgba(0,230,118,0.1);
+        text-align: center;
+        animation: fadeIn 0.6s ease-out;
+    }
+    .login-box .logo-icon {
+        width: 64px; height: 64px; margin: 0 auto 24px auto; font-size: 2rem;
+    }
+    .login-box h2 {
+        font-family: var(--font-display); font-size: 2rem; margin-bottom: 8px;
+    }
+    .login-box p { color: var(--text-muted); margin-bottom: 30px; font-size: 1rem; }
+    .form-group { text-align: left; margin-bottom: 20px; }
+    .login-btn { width: 100%; padding: 14px; font-size: 1.05rem; margin-top: 10px; border-radius: 30px; }
+    
+    .error-msg { color: var(--danger-color); font-size: 0.9rem; margin-top: 15px; display: none; background: var(--danger-light); padding: 10px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .success-msg { color: var(--success-color); font-size: 0.9rem; margin-top: 15px; display: none; background: var(--primary-light); padding: 10px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); }
+    
+    .register-link { margin-top: 25px; display: block; font-size: 0.95rem; color: var(--text-muted); text-decoration: none; }
+    .register-link span { color: var(--primary-color); font-weight: 600; }
+    .register-link:hover span { text-decoration: underline; }
+  </style>
+</head>
+<body class="login-body">
+
+<div class="login-box">
+  <div class="logo-icon"><i class="fa-solid fa-user-plus"></i></div>
+  <h2>Criar Conta</h2>
+  <p>Cadastre-se como gestor da academia</p>
+  
+  <form id="registerForm">
+    <div class="form-group">
+      <label>Nome Completo</label>
+      <input type="text" id="nome" class="form-input" placeholder="ex: João da Silva" required>
+    </div>
+    <div class="form-group">
+      <label>E-mail Corporativo</label>
+      <input type="email" id="email" class="form-input" placeholder="ex: joao@gymcore.com" required>
+    </div>
+    <div class="form-group">
+      <label>Senha de Acesso</label>
+      <input type="password" id="senha" class="form-input" placeholder="••••••••" required>
+    </div>
+    
+    <button type="submit" class="btn btn-primary login-btn">Cadastrar Usuário</button>
+    <div id="errorMsg" class="error-msg"></div>
+    <div id="successMsg" class="success-msg">Cadastro realizado com sucesso! Redirecionando...</div>
+  </form>
+
+  <a href="login.html" class="register-link">Já possui uma conta? <span>Fazer Login</span></a>
+</div>
+
+<script>
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nome = document.getElementById('nome').value;
+    const email = document.getElementById('email').value;
+    const senha = document.getElementById('senha').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const successMsg = document.getElementById('successMsg');
+    const btn = document.querySelector('.login-btn');
+    
+    errorMsg.style.display = 'none';
+    successMsg.style.display = 'none';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cadastrando...';
+    btn.style.pointerEvents = 'none';
+    
+    try {
+        const response = await fetch('http://localhost:5105/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, email, senha })
+        });
+        
+        const data = await response.json();
+        
+        if(response.ok) {
+            successMsg.style.display = 'block';
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        } else {
+            errorMsg.textContent = data.message || 'Erro ao cadastrar.';
+            errorMsg.style.display = 'block';
+            btn.innerHTML = 'Cadastrar Usuário';
+            btn.style.pointerEvents = 'all';
+        }
+    } catch(err) {
+        errorMsg.textContent = 'Erro ao conectar. A API está rodando?';
+        errorMsg.style.display = 'block';
+        btn.innerHTML = 'Cadastrar Usuário';
+        btn.style.pointerEvents = 'all';
+    }
+  });
+</script>
+</body>
+</html>

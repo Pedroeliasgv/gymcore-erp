@@ -1,0 +1,16 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.db
+
+# Node (caso use depois)
+node_modules/
+
+# VSCode
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db

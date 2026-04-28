@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GymCore ERP - Gestão de Academias</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="brand" style="padding: 0; margin-right: 20px;">
+          <div class="logo-icon">
+            <i class="fa-solid fa-dumbbell"></i>
+          </div>
+          <div class="brand-name">
+            <h2>GymCore</h2>
+          </div>
+        </div>
+
+        <!-- MENU SUSPENSO -->
+        <div class="dropdown">
+          <button class="btn btn-outline dropdown-btn">
+            Módulos <i class="fa-solid fa-chevron-down"></i>
+          </button>
+          <div class="dropdown-content">
+            <button class="nav-item active" data-target="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+            <button class="nav-item" data-target="alunos"><i class="fa-solid fa-users"></i> Alunos</button>
+            <button class="nav-item" data-target="financeiro"><i class="fa-solid fa-wallet"></i> Financeiro</button>
+            <button class="nav-item" data-target="treinos"><i class="fa-solid fa-clipboard-list"></i> Gestão de Treinos</button>
+            <button class="nav-item" data-target="planos"><i class="fa-solid fa-tags"></i> Planos e Contratos</button>
+            <button class="nav-item" data-target="operacional"><i class="fa-solid fa-clock"></i> Operacional</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="search-wrapper" style="margin-left: auto; margin-right: 20px;">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" placeholder="Buscar...">
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Notificações">
+          <i class="fa-regular fa-bell"></i>
+          <span class="badge">3</span>
+        </button>
+        <div class="user-info" style="margin-left: 10px; cursor: pointer;" title="Sair do sistema" onclick="logout()">
+          <img src="https://ui-avatars.com/api/?name=Admin+User&background=10b981&color=fff" alt="Avatar" class="avatar" style="width: 35px; height: 35px;">
+        </div>
+      </div>
+    </header>
+
+    <div class="content-wrapper">
+      
+      <!-- DASHBOARD SECTION -->
+      <section id="dashboard" class="page-section active">
+        <div class="section-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p>Visão geral estratégica da sua academia.</p>
+          </div>
+          <button class="btn btn-outline"><i class="fa-solid fa-download"></i> Exportar Relatório</button>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon primary"><i class="fa-solid fa-users"></i></div>
+            <div class="metric-info">
+              <h3>Alunos Ativos</h3>
+              <div class="metric-value">482 <span class="trend up"><i class="fa-solid fa-arrow-up"></i> 12%</span></div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon success"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+            <div class="metric-info">
+              <h3>Receita Mensal</h3>
+              <div class="metric-value">R$ 45.230 <span class="trend up"><i class="fa-solid fa-arrow-up"></i> 5%</span></div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="metric-info">
+              <h3>Inadimplência</h3>
+              <div class="metric-value">8% <span class="trend down"><i class="fa-solid fa-arrow-down"></i> 2%</span></div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon warning"><i class="fa-solid fa-check-double"></i></div>
+            <div class="metric-info">
+              <h3>Check-ins Hoje</h3>
+              <div class="metric-value">156</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Evolução da Receita</h3>
+            <div class="chart-wrapper">
+              <canvas id="revenueChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>Frequência por Horário (Pico)</h3>
+            <div class="chart-wrapper">
+              <canvas id="attendanceChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ALUNOS SECTION -->
+      <section id="alunos" class="page-section">
+        <div class="section-header">
+          <div>
+            <h1>Gestão de Alunos</h1>
+            <p>Controle de matrículas, cadastros e status.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modalAluno')"><i class="fa-solid fa-plus"></i> Novo Aluno</button>
+        </div>
+
+        <div class="card">
+          <div class="table-controls">
+            <div class="filter-group">
+              <select class="form-select">
+                <option value="">Todos os Status</option>
+                <option value="Ativo">Ativo</option>
+                <option value="Inadimplente">Inadimplente</option>
+                <option value="Cancelado">Cancelado</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Plano</th>
+                  <th>Situação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="listaAlunos">
+                <!-- Preenchido via JS (API) -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- FINANCEIRO SECTION -->
+      <section id="financeiro" class="page-section">
+        <div class="section-header">
+          <div>
+            <h1>Controle Financeiro</h1>
+            <p>Gestão de pagamentos, mensalidades e caixa.</p>
+          </div>
+          <button class="btn btn-success"><i class="fa-solid fa-file-invoice-dollar"></i> Registrar Pagamento</button>
+        </div>
+
+        <div class="finance-cards">
+          <div class="finance-card balance">
+            <h3>Saldo Atual</h3>
+            <h2>R$ 28.450,00</h2>
+            <p>Atualizado hoje</p>
+          </div>
+          <div class="finance-card">
+            <h3>A Receber (Mês)</h3>
+            <h2 class="text-warning">R$ 12.300,00</h2>
+          </div>
+          <div class="finance-card">
+            <h3>Inadimplência</h3>
+            <h2 class="text-danger">R$ 3.480,00</h2>
+            <button class="btn btn-sm btn-outline danger mt-2">Cobrar Alunos</button>
+          </div>
+        </div>
+
+        <div class="card mt-4">
+          <h3>Últimas Transações</h3>
+          <table class="data-table mt-2">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Aluno/Descrição</th>
+                <th>Tipo</th>
+                <th>Valor</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>28/04/2026</td>
+                <td>João Silva - Mensalidade</td>
+                <td>Entrada</td>
+                <td class="text-success">+ R$ 120,00</td>
+                <td><span class="badge success">Pago</span></td>
+              </tr>
+              <tr>
+                <td>27/04/2026</td>
+                <td>Maria Souza - Plano Anual</td>
+                <td>Entrada</td>
+                <td class="text-success">+ R$ 1.000,00</td>
+                <td><span class="badge success">Pago</span></td>
+              </tr>
+              <tr>
+                <td>27/04/2026</td>
+                <td>Manutenção Equipamentos</td>
+                <td>Saída</td>
+                <td class="text-danger">- R$ 450,00</td>
+                <td><span class="badge success">Pago</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TREINOS SECTION -->
+      <section id="treinos" class="page-section">
+        <div class="section-header">
+          <div>
+            <h1>Gestão de Treinos</h1>
+            <p>Fichas padrão e acompanhamento técnico.</p>
+          </div>
+          <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nova Ficha</button>
+        </div>
+
+        <div class="workouts-grid">
+          <div class="workout-card">
+            <div class="workout-header">
+              <h3>Adaptação Iniciante</h3>
+              <span class="badge info">Nível 1</span>
+            </div>
+            <p>Ficha de corpo todo para as 2 primeiras semanas.</p>
+            <div class="workout-meta">
+              <span><i class="fa-solid fa-user-tie"></i> Inst. Carlos</span>
+              <span><i class="fa-solid fa-users"></i> 45 alunos</span>
+            </div>
+          </div>
+          <div class="workout-card">
+            <div class="workout-header">
+              <h3>Hipertrofia ABC</h3>
+              <span class="badge warning">Nível 3</span>
+            </div>
+            <p>Treino focado em ganho de massa, dividido em 3 dias.</p>
+            <div class="workout-meta">
+              <span><i class="fa-solid fa-user-tie"></i> Inst. Roberto</span>
+              <span><i class="fa-solid fa-users"></i> 120 alunos</span>
+            </div>
+          </div>
+          <div class="workout-card">
+            <div class="workout-header">
+              <h3>Emagrecimento HIIT</h3>
+              <span class="badge danger">Nível 2</span>
+            </div>
+            <p>Circuito aeróbico + funcional de alta intensidade.</p>
+            <div class="workout-meta">
+              <span><i class="fa-solid fa-user-tie"></i> Inst. Amanda</span>
+              <span><i class="fa-solid fa-users"></i> 85 alunos</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PLANOS SECTION -->
+      <section id="planos" class="page-section">
+        <div class="section-header">
+          <div>
+            <h1>Planos e Contratos</h1>
+            <p>Configure os planos oferecidos pela academia.</p>
+          </div>
+          <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Novo Plano</button>
+        </div>
+
+        <div class="plans-grid">
+          <div class="plan-card">
+            <h3>Mensal</h3>
+            <div class="plan-price">R$ 120<span>/mês</span></div>
+            <ul class="plan-features">
+              <li><i class="fa-solid fa-check"></i> Musculação livre</li>
+              <li><i class="fa-solid fa-check"></i> Aulas coletivas</li>
+              <li class="disabled"><i class="fa-solid fa-xmark"></i> Avaliação física</li>
+            </ul>
+            <button class="btn btn-outline w-100">Editar Plano</button>
+          </div>
+          <div class="plan-card featured">
+            <div class="featured-badge">Mais Popular</div>
+            <h3>Trimestral</h3>
+            <div class="plan-price">R$ 100<span>/mês</span></div>
+            <ul class="plan-features">
+              <li><i class="fa-solid fa-check"></i> Musculação livre</li>
+              <li><i class="fa-solid fa-check"></i> Aulas coletivas</li>
+              <li><i class="fa-solid fa-check"></i> 1 Avaliação física</li>
+            </ul>
+            <button class="btn btn-primary w-100">Editar Plano</button>
+          </div>
+          <div class="plan-card">
+            <h3>Anual</h3>
+            <div class="plan-price">R$ 89<span>/mês</span></div>
+            <ul class="plan-features">
+              <li><i class="fa-solid fa-check"></i> Musculação livre</li>
+              <li><i class="fa-solid fa-check"></i> Aulas coletivas</li>
+              <li><i class="fa-solid fa-check"></i> Avaliação física bimestral</li>
+              <li><i class="fa-solid fa-check"></i> Acesso livre com convidados (Sáb)</li>
+            </ul>
+            <button class="btn btn-outline w-100">Editar Plano</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- OPERACIONAL SECTION -->
+      <section id="operacional" class="page-section">
+        <div class="section-header">
+          <div>
+            <h1>Operacional & Check-in</h1>
+            <p>Controle de entrada e horários.</p>
+          </div>
+        </div>
+        
+        <div class="card checkin-panel">
+          <div class="checkin-reader">
+            <i class="fa-solid fa-id-card fa-4x text-muted"></i>
+            <h3>Aguardando catraca / leitor...</h3>
+            <input type="text" placeholder="Ou digite o CPF" class="form-input text-center mt-2" style="max-width: 300px;">
+            <button class="btn btn-primary mt-2">Liberar Acesso</button>
+          </div>
+          <div class="checkin-feed">
+            <h3>Últimos Acessos</h3>
+            <ul class="feed-list">
+              <li>
+                <div class="feed-time">Agora</div>
+                <div class="feed-info">
+                  <strong>Marcos Silva</strong> liberado
+                  <span class="badge success">Plano OK</span>
+                </div>
+              </li>
+              <li>
+                <div class="feed-time">2 min</div>
+                <div class="feed-info">
+                  <strong>Aline Ferreira</strong> bloqueada
+                  <span class="badge danger">Inadimplente</span>
+                </div>
+              </li>
+              <li>
+                <div class="feed-time">5 min</div>
+                <div class="feed-info">
+                  <strong>Roberto Costa</strong> liberado
+                  <span class="badge success">Plano OK</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal Novo Aluno -->
+<div class="modal-overlay" id="modalAluno">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Cadastrar Novo Aluno</h2>
+      <button class="close-btn" onclick="closeModal('modalAluno')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="formAluno">
+        <div class="form-group">
+          <label>Nome Completo</label>
+          <input type="text" id="nome" class="form-input" placeholder="Ex: João da Silva" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>CPF</label>
+            <input type="text" id="cpf" class="form-input" placeholder="000.000.000-00" required>
+          </div>
+          <div class="form-group">
+            <label>Plano</label>
+            <select id="plano" class="form-select">
+              <option value="Mensal">Mensal - R$ 120</option>
+              <option value="Trimestral">Trimestral - R$ 100/m</option>
+              <option value="Anual">Anual - R$ 89/m</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalAluno')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarAluno()">Cadastrar Aluno</button>
+    </div>
+  </div>
+</div>
+
+<script src="./js/script.js"></script>
+</body>
+</html>
