@@ -3,9 +3,20 @@ if (!localStorage.getItem('gymcore_token')) {
     window.location.href = 'login.html';
 }
 
+function carregarDadosPerfil() {
+    const userName = localStorage.getItem('gymcore_user') || 'Usuário';
+    const userEmail = localStorage.getItem('gymcore_email') || 'email@gymcore.com';
+    
+    document.getElementById('profileNameDisplay').textContent = userName;
+    document.getElementById('profileEmailDisplay').textContent = userEmail;
+    
+    // Generate avatar based on name
+    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=00e676&color=000&bold=true`;
+    document.getElementById('topbarAvatar').src = avatarUrl;
+}
+
 function logout() {
-    localStorage.removeItem('gymcore_token');
-    localStorage.removeItem('gymcore_user');
+    localStorage.clear();
     window.location.href = 'login.html';
 }
 
@@ -136,15 +147,47 @@ function renderAlunos() {
             <tr>
                 <td><strong>${a.nome}</strong></td><td>${a.cpf}</td><td>${a.plano}</td>
                 <td><span class="badge ${badgeClass}">${a.status}</span></td>
-                <td><button class="icon-btn" style="width:30px; height:30px;" title="Editar"><i class="fa-solid fa-pen"></i></button></td>
+                <td><button class="icon-btn" style="width:30px; height:30px;" title="Registrar Acesso" onclick="registrarCheckin('${a.nome}')"><i class="fa-solid fa-arrow-right-to-bracket text-success"></i></button></td>
             </tr>`;
     });
+}
+
+async function registrarCheckin(alunoNome) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/checkins`, {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nomeAluno: alunoNome, status: 'Liberado', motivo: 'Catraca 1' })
+        });
+        if (response.ok) {
+            alert(`Check-in de ${alunoNome} registrado com sucesso!`);
+            loadDashboard();
+        }
+    } catch (e) { console.error(e); }
 }
 
 // FINANCEIRO
 async function carregarFinanceiro() {
     const transacoes = await fetchData('transacoes') || [];
     const tbody = document.querySelector("#financeiro .data-table tbody");
+    
+    // Calcular metricas
+    let saldo = 0;
+    let receber = 0;
+    let inadimplencia = 3480; // Hardcoded mock
+    
+    transacoes.forEach(t => {
+        if (t.status === 'Pago') {
+            if (t.tipo === 'Entrada') saldo += t.valor;
+            else saldo -= t.valor;
+        } else if (t.tipo === 'Entrada') {
+            receber += t.valor;
+        }
+    });
+    
+    document.getElementById('finSaldo').textContent = `R$ ${saldo.toFixed(2).replace('.',',')}`;
+    document.getElementById('finReceber').textContent = `R$ ${receber.toFixed(2).replace('.',',')}`;
+    document.getElementById('finInadimplencia').textContent = `R$ ${inadimplencia.toFixed(2).replace('.',',')}`;
+
     if(transacoes.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">Nenhuma transação financeira.</td></tr>`;
         return;
@@ -167,13 +210,39 @@ async function carregarFinanceiro() {
     });
 }
 
+async function salvarTransacao() {
+    const descricao = document.getElementById('transDescricao').value;
+    const tipo = document.getElementById('transTipo').value;
+    const valor = parseFloat(document.getElementById('transValor').value);
+    
+    if (!descricao || !valor) return alert('Preencha os campos obrigatórios!');
+    
+    try {
+        const res = await fetch(`${API_BASE_URL}/transacoes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ descricao, tipo, valor, data: new Date().toISOString(), status: 'Pago' })
+        });
+        
+        if (res.ok) {
+            closeModal('modalTransacao');
+            document.getElementById('formTransacao').reset();
+            carregarFinanceiro();
+            loadDashboard();
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao salvar transação.');
+    }
+}
+
 // TREINOS
 async function carregarTreinos() {
     const treinos = await fetchData('treinos') || [];
     const grid = document.querySelector(".workouts-grid");
     
     if(treinos.length === 0) {
-        grid.innerHTML = `<p class="text-muted text-center w-100">Nenhuma ficha de treino cadastrada. (Use a API para cadastrar).</p>`;
+        grid.innerHTML = `<p class="text-muted text-center w-100" style="grid-column: 1/-1; padding: 40px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px dashed var(--border-color);">Nenhuma ficha cadastrada. Clique em "Nova Ficha".</p>`;
         return;
     }
 
@@ -195,13 +264,38 @@ async function carregarTreinos() {
     });
 }
 
+async function salvarTreino() {
+    const nome = document.getElementById('treinoNome').value;
+    const nivel = document.getElementById('treinoNivel').value;
+    const instrutor = document.getElementById('treinoInstrutor').value;
+    
+    if (!nome || !instrutor) return alert('Preencha os campos obrigatórios!');
+    
+    try {
+        const res = await fetch(`${API_BASE_URL}/treinos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, nivel, descricao: 'Ficha padronizada pelo instrutor', instrutor, quantidadeAlunos: 0 })
+        });
+        
+        if (res.ok) {
+            closeModal('modalTreino');
+            document.getElementById('formTreino').reset();
+            carregarTreinos();
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao salvar treino.');
+    }
+}
+
 // PLANOS
 async function carregarPlanos() {
     const planos = await fetchData('planos') || [];
     const grid = document.querySelector(".plans-grid");
     
     if(planos.length === 0) {
-        grid.innerHTML = `<p class="text-muted text-center w-100">Nenhum plano configurado. (Use a API para cadastrar).</p>`;
+        grid.innerHTML = `<p class="text-muted text-center w-100" style="grid-column: 1/-1; padding: 40px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px dashed var(--border-color);">Nenhum plano configurado. Clique em "Novo Plano" para cadastrar.</p>`;
         return;
     }
 
@@ -216,12 +310,59 @@ async function carregarPlanos() {
             <div class="plan-card ${featClass}">
                 ${badge}
                 <h3>${p.nome}</h3>
-                <div class="plan-price">R$ ${p.valorMensal}<span>/mês</span></div>
+                <div class="plan-price">R$ ${p.valorMensal.toFixed(2)}<span>/mês</span></div>
                 <ul class="plan-features">${benHtml}</ul>
-                <button class="btn ${p.destaque ? 'btn-primary' : 'btn-outline'} w-100">Assinar</button>
+                <div style="display: flex; gap: 10px; margin-top: auto;">
+                    <button class="btn btn-outline" style="flex: 1;" onclick="alert('Edição será implementada em breve!')"><i class="fa-solid fa-pen"></i> Editar</button>
+                    <button class="btn" style="background: rgba(239, 68, 68, 0.1); color: var(--danger-color); border: 1px solid var(--danger-color);" onclick="excluirPlano(${p.id})"><i class="fa-solid fa-trash"></i> Excluir</button>
+                </div>
             </div>
         `;
     });
+}
+
+async function salvarPlano() {
+    const nome = document.getElementById('planoNome').value;
+    const valorMensal = parseFloat(document.getElementById('planoValor').value);
+    const beneficios = document.getElementById('planoBeneficios').value;
+    const destaque = document.getElementById('planoDestaque').checked;
+    
+    if (!nome || !valorMensal || !beneficios) return alert('Preencha os campos obrigatórios!');
+    
+    try {
+        const res = await fetch(`${API_BASE_URL}/planos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome, valorMensal, beneficios, destaque })
+        });
+        
+        if (res.ok) {
+            closeModal('modalPlano');
+            document.getElementById('formPlano').reset();
+            carregarPlanos();
+        } else {
+            alert('Erro ao salvar plano.');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao salvar plano.');
+    }
+}
+
+async function excluirPlano(id) {
+    if (!confirm('Tem certeza que deseja excluir este plano? Esta ação não pode ser desfeita.')) return;
+    
+    try {
+        const res = await fetch(`${API_BASE_URL}/planos/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            carregarPlanos();
+        } else {
+            alert('Erro ao excluir plano.');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Erro ao excluir plano.');
+    }
 }
 
 // OPERACIONAL
@@ -250,8 +391,51 @@ async function carregarCheckins() {
     });
 }
 
+// Profile logic
+function openProfileModal() {
+    document.getElementById('profileNome').value = localStorage.getItem('gymcore_user') || '';
+    document.getElementById('profileEmail').value = localStorage.getItem('gymcore_email') || '';
+    document.getElementById('profileSenha').value = '';
+    openModal('modalProfile');
+}
+
+async function salvarPerfil() {
+    const nome = document.getElementById('profileNome').value;
+    const email = document.getElementById('profileEmail').value;
+    const senha = document.getElementById('profileSenha').value;
+    const userId = localStorage.getItem('gymcore_userid');
+    
+    if (!userId || userId === "0") {
+        alert("O usuário Administrador padrão (Demo) não pode ter seu perfil editado via API.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/profile/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome: nome, email: email, novaSenha: senha })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            localStorage.setItem('gymcore_user', result.user);
+            localStorage.setItem('gymcore_email', result.email);
+            carregarDadosPerfil();
+            closeModal('modalProfile');
+            alert("Perfil atualizado com sucesso!");
+        } else {
+            alert("Erro ao atualizar o perfil.");
+        }
+    } catch (error) {
+        console.error("Error updating profile:", error);
+    }
+}
+
 // INIT
 window.addEventListener('DOMContentLoaded', () => {
     initCharts();
     loadDashboard();
+    fetchAlunos();
+    carregarDadosPerfil();
 });

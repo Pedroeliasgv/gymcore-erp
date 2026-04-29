@@ -96,6 +96,8 @@
             // Salva token
             localStorage.setItem('gymcore_token', data.token);
             localStorage.setItem('gymcore_user', data.user);
+            localStorage.setItem('gymcore_userid', data.userId);
+            localStorage.setItem('gymcore_email', data.email);
             window.location.href = 'index.html';
         } else {
             errorMsg.textContent = 'E-mail ou senha incorretos.';

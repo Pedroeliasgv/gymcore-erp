@@ -787,3 +787,18 @@ label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bott
   padding: 30px; border-top: 1px solid var(--border-color);
   display: flex; justify-content: flex-end; gap: 16px;
 }
+
+/* === ANIMATIONS === */
+@keyframes slideUpFade {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.card, .finance-card, .metric-card, .workout-card, .plan-card, .data-table tr, .feed-list li {
+  animation: slideUpFade 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+}
+
+.finance-card:nth-child(1), .metric-card:nth-child(1), .workout-card:nth-child(1) { animation-delay: 0.1s; }
+.finance-card:nth-child(2), .metric-card:nth-child(2), .workout-card:nth-child(2) { animation-delay: 0.2s; }
+.finance-card:nth-child(3), .metric-card:nth-child(3), .workout-card:nth-child(3) { animation-delay: 0.3s; }
+.finance-card:nth-child(4), .metric-card:nth-child(4), .workout-card:nth-child(4) { animation-delay: 0.4s; }

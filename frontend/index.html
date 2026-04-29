@@ -61,8 +61,20 @@
           <i class="fa-regular fa-bell"></i>
           <span class="badge">3</span>
         </button>
-        <div class="user-info" style="margin-left: 10px; cursor: pointer;" title="Sair do sistema" onclick="logout()">
-          <img src="https://ui-avatars.com/api/?name=Admin+User&background=10b981&color=fff" alt="Avatar" class="avatar" style="width: 35px; height: 35px;">
+        <!-- PROFILE DROPDOWN -->
+        <div class="dropdown profile-dropdown">
+          <div class="user-info dropdown-btn" style="border: none; padding: 0; background: transparent;">
+            <img id="topbarAvatar" src="https://ui-avatars.com/api/?name=User&background=10b981&color=fff" alt="Avatar" class="avatar" style="width: 44px; height: 44px; cursor: pointer; border-radius: 50%;">
+          </div>
+          <div class="dropdown-content profile-menu" style="min-width: 220px; right: 0; left: auto; top: calc(100% + 10px);">
+            <div style="padding: 15px; border-bottom: 1px solid var(--border-color); text-align: center; margin-bottom: 5px;">
+              <strong style="display: block; font-family: var(--font-display); font-size: 1.1rem; color: var(--primary-color);" id="profileNameDisplay">Usuário</strong>
+              <span style="font-size: 0.8rem; color: var(--text-muted);" id="profileEmailDisplay">email@gymcore.com</span>
+            </div>
+            <button class="nav-item" onclick="openProfileModal()"><i class="fa-solid fa-user-pen"></i> Editar Perfil</button>
+            <button class="nav-item" onclick="alert('Tema claro em desenvolvimento!')"><i class="fa-solid fa-moon"></i> Alterar Tema</button>
+            <button class="nav-item" style="color: var(--danger-color);" onclick="logout()"><i class="fa-solid fa-right-from-bracket" style="color: var(--danger-color);"></i> Sair do Sistema</button>
+          </div>
         </div>
       </div>
     </header>
@@ -173,22 +185,22 @@
             <h1>Controle Financeiro</h1>
             <p>Gestão de pagamentos, mensalidades e caixa.</p>
           </div>
-          <button class="btn btn-success"><i class="fa-solid fa-file-invoice-dollar"></i> Registrar Pagamento</button>
+          <button class="btn btn-success" onclick="openModal('modalTransacao')"><i class="fa-solid fa-file-invoice-dollar"></i> Registrar Pagamento</button>
         </div>
 
-        <div class="finance-cards">
+        <div class="metrics-grid mt-4">
           <div class="finance-card balance">
             <h3>Saldo Atual</h3>
-            <h2>R$ 28.450,00</h2>
+            <h2 id="finSaldo">R$ 0,00</h2>
             <p>Atualizado hoje</p>
           </div>
           <div class="finance-card">
             <h3>A Receber (Mês)</h3>
-            <h2 class="text-warning">R$ 12.300,00</h2>
+            <h2 class="text-warning" id="finReceber">R$ 0,00</h2>
           </div>
           <div class="finance-card">
             <h3>Inadimplência</h3>
-            <h2 class="text-danger">R$ 3.480,00</h2>
+            <h2 class="text-danger" id="finInadimplencia">R$ 0,00</h2>
             <button class="btn btn-sm btn-outline danger mt-2">Cobrar Alunos</button>
           </div>
         </div>
@@ -199,34 +211,14 @@
             <thead>
               <tr>
                 <th>Data</th>
-                <th>Aluno/Descrição</th>
+                <th>Descrição</th>
                 <th>Tipo</th>
                 <th>Valor</th>
                 <th>Status</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>28/04/2026</td>
-                <td>João Silva - Mensalidade</td>
-                <td>Entrada</td>
-                <td class="text-success">+ R$ 120,00</td>
-                <td><span class="badge success">Pago</span></td>
-              </tr>
-              <tr>
-                <td>27/04/2026</td>
-                <td>Maria Souza - Plano Anual</td>
-                <td>Entrada</td>
-                <td class="text-success">+ R$ 1.000,00</td>
-                <td><span class="badge success">Pago</span></td>
-              </tr>
-              <tr>
-                <td>27/04/2026</td>
-                <td>Manutenção Equipamentos</td>
-                <td>Saída</td>
-                <td class="text-danger">- R$ 450,00</td>
-                <td><span class="badge success">Pago</span></td>
-              </tr>
+            <tbody id="listaTransacoes">
+              <!-- JS render -->
             </tbody>
           </table>
         </div>
@@ -239,43 +231,11 @@
             <h1>Gestão de Treinos</h1>
             <p>Fichas padrão e acompanhamento técnico.</p>
           </div>
-          <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nova Ficha</button>
+          <button class="btn btn-primary" onclick="openModal('modalTreino')"><i class="fa-solid fa-plus"></i> Nova Ficha</button>
         </div>
 
-        <div class="workouts-grid">
-          <div class="workout-card">
-            <div class="workout-header">
-              <h3>Adaptação Iniciante</h3>
-              <span class="badge info">Nível 1</span>
-            </div>
-            <p>Ficha de corpo todo para as 2 primeiras semanas.</p>
-            <div class="workout-meta">
-              <span><i class="fa-solid fa-user-tie"></i> Inst. Carlos</span>
-              <span><i class="fa-solid fa-users"></i> 45 alunos</span>
-            </div>
-          </div>
-          <div class="workout-card">
-            <div class="workout-header">
-              <h3>Hipertrofia ABC</h3>
-              <span class="badge warning">Nível 3</span>
-            </div>
-            <p>Treino focado em ganho de massa, dividido em 3 dias.</p>
-            <div class="workout-meta">
-              <span><i class="fa-solid fa-user-tie"></i> Inst. Roberto</span>
-              <span><i class="fa-solid fa-users"></i> 120 alunos</span>
-            </div>
-          </div>
-          <div class="workout-card">
-            <div class="workout-header">
-              <h3>Emagrecimento HIIT</h3>
-              <span class="badge danger">Nível 2</span>
-            </div>
-            <p>Circuito aeróbico + funcional de alta intensidade.</p>
-            <div class="workout-meta">
-              <span><i class="fa-solid fa-user-tie"></i> Inst. Amanda</span>
-              <span><i class="fa-solid fa-users"></i> 85 alunos</span>
-            </div>
-          </div>
+        <div class="workouts-grid" id="listaTreinos">
+          <!-- JS render -->
         </div>
       </section>
 
@@ -286,7 +246,7 @@
             <h1>Planos e Contratos</h1>
             <p>Configure os planos oferecidos pela academia.</p>
           </div>
-          <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Novo Plano</button>
+          <button class="btn btn-primary" onclick="openModal('modalPlano')"><i class="fa-solid fa-plus"></i> Novo Plano</button>
         </div>
 
         <div class="plans-grid">
@@ -406,6 +366,139 @@
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalAluno')">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarAluno()">Cadastrar Aluno</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Perfil -->
+<div class="modal-overlay" id="modalProfile">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Configurações do Perfil</h2>
+      <button class="close-btn" onclick="closeModal('modalProfile')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="formProfile">
+        <div class="form-group">
+          <label>Nome do Gestor</label>
+          <input type="text" id="profileNome" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label>E-mail Corporativo</label>
+          <input type="email" id="profileEmail" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label>Nova Senha (deixe em branco para manter)</label>
+          <input type="password" id="profileSenha" class="form-input" placeholder="••••••••">
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalProfile')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPerfil()">Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Novo Plano -->
+<div class="modal-overlay" id="modalPlano">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Cadastrar Novo Plano</h2>
+      <button class="close-btn" onclick="closeModal('modalPlano')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="formPlano">
+        <div class="form-group">
+          <label>Nome do Plano</label>
+          <input type="text" id="planoNome" class="form-input" placeholder="Ex: Premium Anual" required>
+        </div>
+        <div class="form-group">
+          <label>Valor Mensal (R$)</label>
+          <input type="number" id="planoValor" class="form-input" placeholder="Ex: 89.90" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>Benefícios (separados por vírgula)</label>
+          <input type="text" id="planoBeneficios" class="form-input" placeholder="Musculação, Dança, Piscina" required>
+        </div>
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 20px;">
+          <input type="checkbox" id="planoDestaque" style="width: 20px; height: 20px;">
+          <label style="margin: 0; font-size: 1rem; color: var(--text-main);">Destacar este plano (Mais Popular)</label>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalPlano')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPlano()">Salvar Plano</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nova Transação (Financeiro) -->
+<div class="modal-overlay" id="modalTransacao">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Lançar Transação</h2>
+      <button class="close-btn" onclick="closeModal('modalTransacao')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="formTransacao">
+        <div class="form-group">
+          <label>Descrição</label>
+          <input type="text" id="transDescricao" class="form-input" placeholder="Ex: Mensalidade João" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="transTipo" class="form-select">
+              <option value="Entrada">Entrada (Receita)</option>
+              <option value="Saída">Saída (Despesa)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Valor (R$)</label>
+            <input type="number" id="transValor" class="form-input" placeholder="0.00" step="0.01" required>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalTransacao')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarTransacao()">Lançar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Novo Treino -->
+<div class="modal-overlay" id="modalTreino">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Nova Ficha de Treino</h2>
+      <button class="close-btn" onclick="closeModal('modalTreino')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <form id="formTreino">
+        <div class="form-group">
+          <label>Nome do Treino</label>
+          <input type="text" id="treinoNome" class="form-input" placeholder="Ex: Hipertrofia Avançada" required>
+        </div>
+        <div class="form-group">
+          <label>Nível</label>
+          <select id="treinoNivel" class="form-select">
+            <option value="Iniciante">Iniciante</option>
+            <option value="Intermediário">Intermediário</option>
+            <option value="Avançado">Avançado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nome do Instrutor</label>
+          <input type="text" id="treinoInstrutor" class="form-input" placeholder="Ex: Prof. Silva" required>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalTreino')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarTreino()">Criar Ficha</button>
     </div>
   </div>
 </div>

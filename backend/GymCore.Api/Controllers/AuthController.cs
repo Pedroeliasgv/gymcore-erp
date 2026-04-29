@@ -26,7 +26,9 @@ public class AuthController : ControllerBase
             return Ok(new { 
                 Success = true, 
                 Token = "gymcore-auth-token-" + Guid.NewGuid().ToString(), 
-                User = usuario.Nome 
+                User = usuario.Nome,
+                UserId = usuario.Id,
+                Email = usuario.Email
             });
         }
         
@@ -36,7 +38,9 @@ public class AuthController : ControllerBase
             return Ok(new { 
                 Success = true, 
                 Token = "gymcore-auth-token-xyz987", 
-                User = "Administrador" 
+                User = "Administrador",
+                UserId = 0,
+                Email = "admin@gymcore.com"
             });
         }
         
@@ -44,6 +48,23 @@ public class AuthController : ControllerBase
             Success = false, 
             Message = "E-mail ou senha inválidos." 
         });
+    }
+
+    [HttpPut("profile/{id}")]
+    public async Task<IActionResult> UpdateProfile(int id, [FromBody] UpdateProfileRequest request)
+    {
+        var usuario = await _context.Usuarios.FindAsync(id);
+        if (usuario == null) return NotFound(new { Success = false, Message = "Usuário não encontrado." });
+
+        usuario.Nome = request.Nome;
+        usuario.Email = request.Email;
+        if (!string.IsNullOrEmpty(request.NovaSenha))
+        {
+            usuario.Senha = request.NovaSenha;
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(new { Success = true, Message = "Perfil atualizado com sucesso!", User = usuario.Nome, Email = usuario.Email });
     }
 
     [HttpPost("register")]
@@ -79,4 +100,11 @@ public class RegisterRequest
     public string Nome { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Senha { get; set; } = string.Empty;
+}
+
+public class UpdateProfileRequest
+{
+    public string Nome { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string NovaSenha { get; set; } = string.Empty;
 }
