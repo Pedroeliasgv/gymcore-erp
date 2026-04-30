@@ -1,4 +1,4 @@
-# 💪 GymCore ERP
+# 💪 Ugym ERP
 
 Sistema web de gestão para academias.
 

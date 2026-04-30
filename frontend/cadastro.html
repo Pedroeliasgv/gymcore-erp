@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastro - GymCore ERP</title>
+  <title>Cadastro - Ugym ERP</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,7 +55,7 @@
 
 <div class="login-box">
   <div class="logo-icon"><i class="fa-solid fa-user-plus"></i></div>
-  <h2>Criar Conta</h2>
+  <h2>Ugym ERP</h2>
   <p>Cadastre-se como gestor da academia</p>
   
   <form id="registerForm">
@@ -65,7 +65,7 @@
     </div>
     <div class="form-group">
       <label>E-mail Corporativo</label>
-      <input type="email" id="email" class="form-input" placeholder="ex: joao@gymcore.com" required>
+      <input type="email" id="email" class="form-input" placeholder="ex: joao@ugym.com" required>
     </div>
     <div class="form-group">
       <label>Senha de Acesso</label>
@@ -80,6 +80,7 @@
   <a href="login.html" class="register-link">Já possui uma conta? <span>Fazer Login</span></a>
 </div>
 
+<script src="./js/config.js"></script>
 <script>
   document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -96,7 +97,7 @@
     btn.style.pointerEvents = 'none';
     
     try {
-        const response = await fetch('http://localhost:5105/api/auth/register', {
+        const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome, email, senha })

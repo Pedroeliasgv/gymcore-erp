@@ -15,10 +15,21 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Usa a variável de ambiente DATABASE_PATH se existir (ex: Railway),
+// caso contrário usa o arquivo local gymcore.db
+var dbPath = Environment.GetEnvironmentVariable("DATABASE_PATH") ?? "gymcore.db";
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=gymcore.db"));
+    options.UseSqlite($"Data Source={dbPath}"));
 
 var app = builder.Build();
+
+// Aplica migrações automaticamente ao iniciar (cria o banco se não existir)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
 
 app.UseCors("PermitirFrontend");
 

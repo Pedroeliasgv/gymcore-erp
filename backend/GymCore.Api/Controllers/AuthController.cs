@@ -25,7 +25,7 @@ public class AuthController : ControllerBase
         {
             return Ok(new { 
                 Success = true, 
-                Token = "gymcore-auth-token-" + Guid.NewGuid().ToString(), 
+                Token = "ugym-auth-token-" + Guid.NewGuid().ToString(), 
                 User = usuario.Nome,
                 UserId = usuario.Id,
                 Email = usuario.Email
@@ -33,14 +33,14 @@ public class AuthController : ControllerBase
         }
         
         // Fallback for demo admin
-        if (request.Email == "admin@gymcore.com" && request.Senha == "admin123")
+        if (request.Email == "admin@ugym.com" && request.Senha == "admin123")
         {
             return Ok(new { 
                 Success = true, 
-                Token = "gymcore-auth-token-xyz987", 
+                Token = "ugym-auth-token-xyz987", 
                 User = "Administrador",
                 UserId = 0,
-                Email = "admin@gymcore.com"
+                Email = "admin@ugym.com"
             });
         }
         

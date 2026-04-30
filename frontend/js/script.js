@@ -1,11 +1,11 @@
 // --- AUTHENTICATION CHECK ---
-if (!localStorage.getItem('gymcore_token')) {
+if (!localStorage.getItem('ugym_token')) {
     window.location.href = 'login.html';
 }
 
 function carregarDadosPerfil() {
-    const userName = localStorage.getItem('gymcore_user') || 'Usuário';
-    const userEmail = localStorage.getItem('gymcore_email') || 'email@gymcore.com';
+    const userName = localStorage.getItem('ugym_user') || 'Usuário';
+    const userEmail = localStorage.getItem('ugym_email') || 'email@ugym.com';
     
     document.getElementById('profileNameDisplay').textContent = userName;
     document.getElementById('profileEmailDisplay').textContent = userEmail;
@@ -20,7 +20,7 @@ function logout() {
     window.location.href = 'login.html';
 }
 
-const API_BASE_URL = "http://localhost:5105/api";
+// ✅ API_BASE_URL vem de js/config.js — altere lá para apontar para produção
 
 // DOM Elements & Charts
 let revenueChartInstance = null;
@@ -393,8 +393,8 @@ async function carregarCheckins() {
 
 // Profile logic
 function openProfileModal() {
-    document.getElementById('profileNome').value = localStorage.getItem('gymcore_user') || '';
-    document.getElementById('profileEmail').value = localStorage.getItem('gymcore_email') || '';
+    document.getElementById('profileNome').value = localStorage.getItem('ugym_user') || '';
+    document.getElementById('profileEmail').value = localStorage.getItem('ugym_email') || '';
     document.getElementById('profileSenha').value = '';
     openModal('modalProfile');
 }
@@ -403,7 +403,7 @@ async function salvarPerfil() {
     const nome = document.getElementById('profileNome').value;
     const email = document.getElementById('profileEmail').value;
     const senha = document.getElementById('profileSenha').value;
-    const userId = localStorage.getItem('gymcore_userid');
+    const userId = localStorage.getItem('ugym_userid');
     
     if (!userId || userId === "0") {
         alert("O usuário Administrador padrão (Demo) não pode ter seu perfil editado via API.");
@@ -419,8 +419,8 @@ async function salvarPerfil() {
 
         if (response.ok) {
             const result = await response.json();
-            localStorage.setItem('gymcore_user', result.user);
-            localStorage.setItem('gymcore_email', result.email);
+            localStorage.setItem('ugym_user', result.user);
+            localStorage.setItem('ugym_email', result.email);
             carregarDadosPerfil();
             closeModal('modalProfile');
             alert("Perfil atualizado com sucesso!");

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - GymCore ERP</title>
+  <title>Login - Ugym ERP</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,13 +53,13 @@
 
 <div class="login-box">
   <div class="logo-icon"><i class="fa-solid fa-dumbbell"></i></div>
-  <h2>GymCore ERP</h2>
+  <h2>Ugym ERP</h2>
   <p>Acesse o painel administrativo</p>
   
   <form id="loginForm">
     <div class="form-group">
       <label>E-mail Corporativo</label>
-      <input type="email" id="email" class="form-input" placeholder="ex: admin@gymcore.com" value="" required>
+      <input type="email" id="email" class="form-input" placeholder="ex: admin@ugym.com" value="" required>
     </div>
     <div class="form-group">
       <label>Senha de Acesso</label>
@@ -73,6 +73,7 @@
   <a href="cadastro.html" class="register-link">Ainda não tem acesso? <span>Criar Conta</span></a>
 </div>
 
+<script src="./js/config.js"></script>
 <script>
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -85,7 +86,7 @@
     btn.style.pointerEvents = 'none';
     
     try {
-        const response = await fetch('http://localhost:5105/api/auth/login', {
+        const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, senha })
@@ -94,10 +95,10 @@
         if(response.ok) {
             const data = await response.json();
             // Salva token
-            localStorage.setItem('gymcore_token', data.token);
-            localStorage.setItem('gymcore_user', data.user);
-            localStorage.setItem('gymcore_userid', data.userId);
-            localStorage.setItem('gymcore_email', data.email);
+            localStorage.setItem('ugym_token', data.token);
+            localStorage.setItem('ugym_user', data.user);
+            localStorage.setItem('ugym_userid', data.userId);
+            localStorage.setItem('ugym_email', data.email);
             window.location.href = 'index.html';
         } else {
             errorMsg.textContent = 'E-mail ou senha incorretos.';
